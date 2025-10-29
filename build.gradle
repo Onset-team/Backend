@@ -69,4 +69,3 @@ tasks.named('test') {
 tasks.named('checkstyleTest') {
 	enabled = false
 }
-
