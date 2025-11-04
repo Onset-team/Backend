@@ -19,7 +19,7 @@ COPY src ./src
 RUN ./gradlew build -x test --no-daemon
 
 # 2. 실행 단계: 빌드된 JAR 파일을 가벼운 Java 21 환경에서 실행합니다.
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # 빌드 단계에서 생성된 JAR 파일을 복사합니다.
