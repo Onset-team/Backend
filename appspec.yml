@@ -32,8 +32,3 @@ hooks:
     - location: scripts/health.sh
       timeout: 60
       runas: root
-
-  permissions:
-  - object: /opt/stoov
-    pattern: "**"
-    mode: 755
