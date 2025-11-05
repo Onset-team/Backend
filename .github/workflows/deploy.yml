@@ -1,0 +1,28 @@
+name: deploy-prod
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::912786613636:role/stoov-github-deploy-role
+          aws-region: ap-northeast-2
+
+      - name: Create CodeDeploy deployment (GitHub source)
+        run: |
+          aws deploy create-deployment \
+            --application-name stoov-app \
+            --deployment-group-name stoov-prod-dg \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --github-location repository=${{ github.repository }},commitId=${{ github.sha }} \
+            --description "Deploy ${{ github.sha }} via GitHubLocation"
