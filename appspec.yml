@@ -30,5 +30,5 @@ hooks:
       runas: root
   ValidateService:
     - location: scripts/health.sh
-      timeout: 60
+      timeout: 180
       runas: root
