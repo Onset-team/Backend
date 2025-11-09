@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+
+# files 섹션은 생략(리포 ZIP을 CodeDeploy가 작업 디렉터리에 풀어줌)
+
+hooks:
+  ApplicationStop:
+    - location: scripts/stop.sh
+      timeout: 60
+      runas: root
+  BeforeInstall:
+    - location: scripts/clean.sh
+      runas: root
+  AfterInstall:
+    - location: scripts/build_and_copy.sh
+      timeout: 900
+      runas: root
+  ApplicationStart:
+    - location: scripts/start.sh
+      timeout: 60
+      runas: root
+  ValidateService:
+    - location: scripts/health.sh
+      timeout: 60
+      runas: root
