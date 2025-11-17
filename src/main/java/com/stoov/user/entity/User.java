@@ -46,4 +46,8 @@ public class User extends BaseEntity {
     public String getMaskedNickname() {
         return nickname.substring(0, 6) + "***";
     }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

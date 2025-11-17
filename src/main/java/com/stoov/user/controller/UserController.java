@@ -14,8 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.stoov.user.helper.UserResolver.USER_ID;
 
@@ -51,6 +53,16 @@ public class UserController {
         MyPageResponse response = userService.getMyPage(userId);
 
         return  ResponseEntity.ok(CustomApiResponse.success(response));
+    }
+
+    @PutMapping(value = "/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CustomApiResponse<MyPageResponse>> updateMyProfileImage(
+            HttpServletRequest request,
+            @RequestParam("file") MultipartFile file
+    ) {
+        UUID userId = userResolver.resolveUserId(request); // 세션에서 userId 가져옴
+        MyPageResponse response = userService.updateMyProfileImage(userId, file);
+        return ResponseEntity.ok(CustomApiResponse.success(response));
     }
 
 	private void setSession(HttpServletRequest httpServletRequest, LoginResponse response) {
