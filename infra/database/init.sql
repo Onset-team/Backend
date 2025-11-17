@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS users (
+    user_id UUID PRIMARY KEY,
+    email VARCHAR(254) NOT NULL,
+    sub VARCHAR(64) NOT NULL,
+    nickname VARCHAR(30) NOT NULL,
+    profile_image_url VARCHAR(2048),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_users_sub UNIQUE (sub)
+);
+

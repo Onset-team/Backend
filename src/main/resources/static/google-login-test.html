@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>STOOV Google Login Test</title>
+
+    <!-- Google Identity Services 스크립트 -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        // 구글에서 credential을 받으면 호출되는 콜백
+        function handleCredentialResponse(response) {
+            console.log("Google response:", response);
+
+            const payload = {
+                credential: response.credential
+                // 서버에서 clientId, select_by 안 쓴다면 이 정도면 충분
+            };
+
+            fetch("/api/users/google", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include", // ★ JSESSIONID 쿠키 받으려면 필수
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Server response:", data);
+                    const resultEl = document.getElementById("result");
+                    resultEl.textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                });
+        }
+
+        window.onload = function () {
+            // 페이지 로드 후, 구글 로그인 버튼 초기화 (버튼 UI 버전)
+            google.accounts.id.initialize({
+                client_id: "1039443017272-ddcqnf4elsi7sg60gucpqp7rngp8ci3g.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById("googleBtn"),
+                { theme: "outline", size: "large" }
+            );
+        };
+    </script>
+</head>
+<body>
+<h1>STOOV Google Login Local Test</h1>
+<div id="googleBtn"></div>
+
+<h2>Server Response</h2>
+<pre id="result"></pre>
+</body>
+</html>
