@@ -5,25 +5,29 @@ import java.util.UUID;
 import com.stoov.common.response.CustomApiResponse;
 import com.stoov.user.dto.GoogleOAuthRequest;
 import com.stoov.user.dto.LoginResponse;
+import com.stoov.user.dto.MyPageResponse;
+import com.stoov.user.helper.UserResolver;
 import com.stoov.user.service.GoogleOAuthService;
 
+import com.stoov.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.stoov.user.helper.UserResolver.USER_ID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
 
-    public static final String USER_ID = "userId";
+
 	private final GoogleOAuthService googleOAuthService;
+    private final UserService userService;
+    private final UserResolver userResolver;
 
 	@PostMapping("/google")
 	public ResponseEntity<CustomApiResponse<LoginResponse>> googleOAuth(
@@ -38,6 +42,16 @@ public class UserController {
 
 		return ResponseEntity.ok(CustomApiResponse.success(response));
 	}
+
+    @GetMapping("/my")
+    public ResponseEntity<CustomApiResponse<MyPageResponse>> getMyPage(
+            HttpServletRequest httpServletRequest
+    ){
+        UUID userId = userResolver.resolveUserId(httpServletRequest);
+        MyPageResponse response = userService.getMyPage(userId);
+
+        return  ResponseEntity.ok(CustomApiResponse.success(response));
+    }
 
 	private void setSession(HttpServletRequest httpServletRequest, LoginResponse response) {
         // 세션이 없으면 새로 생성

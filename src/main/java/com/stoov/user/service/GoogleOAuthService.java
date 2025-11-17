@@ -4,5 +4,5 @@ import com.stoov.user.dto.GoogleOAuthRequest;
 import com.stoov.user.dto.LoginResponse;
 
 public interface GoogleOAuthService {
-    LoginResponse login(GoogleOAuthRequest request);
+    public LoginResponse login(GoogleOAuthRequest request);
 }
