@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface UserService {
     public MyPageResponse getMyPage(UUID userId);
     public MyPageResponse updateMyProfileImage(UUID userId, MultipartFile file);
+    public void deleteUser(UUID userId);
 }

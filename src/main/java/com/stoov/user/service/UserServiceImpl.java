@@ -31,6 +31,9 @@ public class UserServiceImpl implements UserService {
     @Value("${s3.base-url:}")
     private String baseUrl;
 
+    @Value("${s3.enabled:true}")
+    private boolean s3Enabled;
+
     public MyPageResponse getMyPage(UUID userId) {
         if (userId == null) {
             return MyPageResponse.builder()
@@ -44,10 +47,6 @@ public class UserServiceImpl implements UserService {
 
         return MyPageResponse.from(user.getNickname(), user.getProfileImageUrl());
     }
-
-
-    @Value("${s3.enabled:true}")
-    private boolean s3Enabled;
 
     //프로필 수정. 형태만 일단 갖추고, 제대로 된 업데이트는 MVP 이후에
     @Transactional
@@ -110,5 +109,12 @@ public class UserServiceImpl implements UserService {
             return key;
         }
         return baseUrl.endsWith("/") ? baseUrl + key : baseUrl + "/" + key;
+    }
+
+    public void deleteUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+
+        userRepository.delete(user);
     }
 }

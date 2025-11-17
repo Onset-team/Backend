@@ -65,6 +65,15 @@ public class UserController {
         return ResponseEntity.ok(CustomApiResponse.success(response));
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(HttpServletRequest httpServletRequest) {
+        UUID userId = userResolver.resolveUserId(httpServletRequest);
+        userService.deleteUser(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
 	private void setSession(HttpServletRequest httpServletRequest, LoginResponse response) {
         // 세션이 없으면 새로 생성
 		HttpSession session = httpServletRequest.getSession(true);
