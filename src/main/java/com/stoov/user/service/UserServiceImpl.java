@@ -4,7 +4,9 @@ import com.stoov.common.exception.BusinessException;
 import com.stoov.common.exception.ErrorCode;
 import com.stoov.user.dto.MyPageResponse;
 import com.stoov.user.entity.User;
+import com.stoov.user.entity.UserAgreement;
 import com.stoov.user.repository.UserRepository;
+import com.stoov.user.repository.UserAgreementRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserAgreementRepository userAgreementRepository;
     private final S3Client s3Client;
 
     @Value("${s3.bucket}")
@@ -111,10 +115,37 @@ public class UserServiceImpl implements UserService {
         return baseUrl.endsWith("/") ? baseUrl + key : baseUrl + "/" + key;
     }
 
+    @Override
+    @Transactional
     public void deleteUser(UUID userId) {
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND);
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
+        userAgreementRepository.findByUserId(userId)
+                .ifPresent(agreement -> agreement.markUserDeleted(OffsetDateTime.now()));
+
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public void saveUserAgreement(UUID userId) {
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (userAgreementRepository.existsByUserIdAndUserDeletedAtIsNull(userId)) {
+            return;
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+
+        OffsetDateTime now = OffsetDateTime.now();
+        UserAgreement agreement = UserAgreement.create(user.getId(), user.getEmail(), user.getNickname(), now);
+        userAgreementRepository.save(agreement);
     }
 }

@@ -1,18 +1,8 @@
 services:
   stoov-app:
-    # 변경 설명: 원래는 image: ${DOCKER_IMAGE:-} 형태로 기본값이 빈 문자열이어서
-    # DOCKER_IMAGE 환경 변수를 지정하지 않고 docker compose를 실행하면
-    # image 이름이 비어 있는 상태로 파싱 오류가 날 수 있었다.
-    # 수정 후에는 DOCKER_IMAGE가 없을 때 'stoov-app'이라는 기본 이미지 이름을 사용하도록 하여
-    # 로컬 개발 환경에서 별도의 설정 없이도 compose가 정상 동작하도록 한다.
     image: ${DOCKER_IMAGE:-stoov-app}
     env_file:
       - .env
-    # 변경 설명: 기존에는 depends_on에서 postgres, redis 서비스를 참조하면서
-    # 정작 이 파일 안에는 해당 서비스 정의가 없어서
-    # docker compose up 실행 시 "정의되지 않은 서비스" 오류가 발생할 수 있었다.
-    # 아래에 postgres/redis 서비스를 함께 정의함으로써
-    # 하나의 docker-compose로 앱과 DB/Redis를 동시에 올릴 수 있게 했다.
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,10 +24,6 @@ services:
       - KAKAO_API_KEY=${KAKAO_API_KEY}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      # 변경 설명: Redis 호스트는 로컬 도커 환경에서는 'redis' 컨테이너 이름을 사용하지만,
-      # 애플리케이션을 컨테이너 밖에서 실행할 때는 .env의 SPRING_DATA_REDIS_HOST 값(예: localhost)이
-      # 그대로 사용되도록 설계되어 있다. 여기서는 "컨테이너 안에서 실행되는 stoov-app" 기준으로
-      # 항상 도커 네트워크의 redis 컨테이너에 붙도록 강제한다.
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_BATCH_JOB_ENABLED=false
@@ -48,10 +34,6 @@ services:
       - stoov-net
 
   postgres:
-    # 변경 설명: 원래 infra/database/docker-compose.yml에만 존재하던 postgres 서비스를
-    # 여기에도 추가해서, 루트 디렉터리에서 docker compose up 한 번으로
-    # 앱과 DB를 동시에 올릴 수 있도록 했다.
-    # 동작: .env의 POSTGRES_DB/USER/PASSWORD/PORT 값을 사용해 로컬 개발용 PostgreSQL 컨테이너를 띄운다.
     image: postgis/postgis:16-3.4 # PostGIS 포함 이미지 사용
     container_name: stoov-postgres
     environment:
@@ -75,10 +57,6 @@ services:
       - stoov-net
 
   redis:
-    # 변경 설명: 마찬가지로 infra/database/docker-compose.yml에 있던 redis 서비스를
-    # 루트 compose에 추가하여, 별도 infra 디렉터리로 이동하지 않고도
-    # 애플리케이션과 Redis를 함께 실행할 수 있도록 했다.
-    # 동작: .env의 REDIS_AOF/REDIS_PORT 값을 사용해 개발용 Redis 컨테이너를 띄운다.
     image: redis:7.4-alpine
     container_name: stoov-redis
     command: [ "sh", "-c", "exec redis-server --appendonly ${REDIS_AOF:-yes}" ]
@@ -97,9 +75,6 @@ services:
       - stoov-net
 
 volumes:
-  # 변경 설명: postgres와 redis 컨테이너의 데이터를 유지하기 위한
-  # 도커 볼륨을 루트 compose에도 정의했다.
-  # 동작: 컨테이너를 내려도 데이터는 볼륨에 유지되어, 개발 중 재시작 시에도 DB/캐시가 유지된다.
   postgres_data:
   redis_data:
 

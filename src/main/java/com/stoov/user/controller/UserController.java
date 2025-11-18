@@ -39,11 +39,18 @@ public class UserController {
         // credential 검증 및 유저 조회/생성
 		LoginResponse response = googleOAuthService.login(request);
 
-        // 세션에만 userId 저장
+        // 세션에 userId 저장
 		setSession(httpServletRequest, response);
 
 		return ResponseEntity.ok(CustomApiResponse.success(response));
 	}
+
+    @PostMapping("/agreements")
+    public ResponseEntity<CustomApiResponse<?>> saveUserAgreement(HttpServletRequest httpServletRequest) {
+        UUID userId = userResolver.resolveUserId(httpServletRequest);
+        userService.saveUserAgreement(userId);
+        return ResponseEntity.ok(CustomApiResponse.success());
+    }
 
     @GetMapping("/my")
     public ResponseEntity<CustomApiResponse<MyPageResponse>> getMyPage(
@@ -52,7 +59,7 @@ public class UserController {
         UUID userId = userResolver.resolveUserId(httpServletRequest);
         MyPageResponse response = userService.getMyPage(userId);
 
-        return  ResponseEntity.ok(CustomApiResponse.success(response));
+        return ResponseEntity.ok(CustomApiResponse.success(response));
     }
 
     @PutMapping(value = "/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -62,6 +69,7 @@ public class UserController {
     ) {
         UUID userId = userResolver.resolveUserId(request); // 세션에서 userId 가져옴
         MyPageResponse response = userService.updateMyProfileImage(userId, file);
+
         return ResponseEntity.ok(CustomApiResponse.success(response));
     }
 
@@ -72,7 +80,6 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
-
 
 	private void setSession(HttpServletRequest httpServletRequest, LoginResponse response) {
         // 세션이 없으면 새로 생성
