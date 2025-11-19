@@ -22,6 +22,8 @@ public class SecurityConfig {
             .formLogin(formLogin -> formLogin.disable())
             // 경로별 인가 설정
             .authorizeHttpRequests(authorize -> authorize
+                // 헬스체크는 항상 허용
+                .requestMatchers("/actuator/health", "/health").permitAll()
                 // 장소 검색 및 상세 조회는 누구나 접근 가능
                 .requestMatchers(HttpMethod.GET, "/api/places").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/places/**").permitAll()
