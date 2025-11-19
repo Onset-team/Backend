@@ -1,0 +1,10 @@
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        #secure: true      # HTTPS만 쓴다면
+      timeout: 2h
+oauth2:
+  google:
+    client-id: "1039443017272-ddcqnf4elsi7sg60gucpqp7rngp8ci3g.apps.googleusercontent.com"

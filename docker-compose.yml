@@ -1,6 +1,6 @@
 services:
   stoov-app:
-    image: ${DOCKER_IMAGE:-}
+    image: ${DOCKER_IMAGE:-stoov-app}
     env_file:
       - .env
     depends_on:
@@ -32,6 +32,51 @@ services:
       - ./logs:/app/logs
     networks:
       - stoov-net
+
+  postgres:
+    image: postgis/postgis:16-3.4 # PostGIS 포함 이미지 사용
+    container_name: stoov-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-stoov_db}
+      POSTGRES_USER: ${POSTGRES_USER:-stoov_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stoov_password}
+      TZ: Asia/Seoul
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - stoov-net
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: stoov-redis
+    command: [ "sh", "-c", "exec redis-server --appendonly ${REDIS_AOF:-yes}" ]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - stoov-net
+
+volumes:
+  postgres_data:
+  redis_data:
 
 networks:
   stoov-net:

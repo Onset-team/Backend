@@ -1,7 +1,16 @@
 version: 0.0
 os: linux
 
-# files 섹션은 생략(리포 ZIP을 CodeDeploy가 작업 디렉터리에 풀어줌)
+files:
+  - source: /
+    destination: /opt/stoov
+
+permissions:
+  - object: /opt/stoov/scripts
+    pattern: "**"
+    mode: 755
+    owner: root
+    group: root
 
 hooks:
   ApplicationStop:
@@ -21,5 +30,5 @@ hooks:
       runas: root
   ValidateService:
     - location: scripts/health.sh
-      timeout: 60
+      timeout: 180
       runas: root
