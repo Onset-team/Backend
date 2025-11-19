@@ -1,6 +1,7 @@
 package com.stoov.place.controller;
 
 import com.stoov.common.dto.PageResponse;
+import com.stoov.place.dto.PlaceResponse;
 import com.stoov.user.helper.UserResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import com.stoov.place.service.PlaceService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -59,6 +61,15 @@ public class PlaceController {
 		PageResponse<PlaceSearchResponse> pageResponse = new PageResponse<>(searchResults, blockSize);
 		return ResponseEntity.ok(CustomApiResponse.success(pageResponse));
 	}
+
+    @GetMapping
+    public ResponseEntity<CustomApiResponse<List<PlaceResponse>>> getAllPlaces(
+            HttpServletRequest request) {
+
+        UUID userId = userResolver.resolveUserId(request);
+        List<PlaceResponse> response = placeService.getAllPlaces(userId);
+        return ResponseEntity.ok(CustomApiResponse.success(response));
+    }
 }
 
 

@@ -6,6 +6,8 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.stoov.common.exception.BusinessException;
+import com.stoov.common.exception.ErrorCode;
 import com.stoov.user.dto.GoogleOAuthRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +33,7 @@ public class GoogleCredentialVerifier {
         try {
             return new UrlJwkProvider(new URL("https://www.googleapis.com/oauth2/v3/certs"));
         } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid Google JWKS URL", e);
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "Invalid Google JWKS URL");
         }
     }
 
@@ -39,7 +41,7 @@ public class GoogleCredentialVerifier {
 
         String idToken = request.getCredential();
         if (idToken == null) {
-            throw new IllegalArgumentException("Google credential이 비어있습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "Google credential이 비어있습니다.");
         }
         try {
             DecodedJWT decodedJWT = JWT.decode(idToken);
@@ -52,16 +54,16 @@ public class GoogleCredentialVerifier {
             algorithm.verify(decodedJWT); // 서명 검증
 
             if (!decodedJWT.getIssuer().equals(GOOGLE_ISSUER)) {
-                throw new RuntimeException("Google issuer(iss) 불일치");
+                throw new BusinessException(ErrorCode.UNAUTHORIZED, "Google issuer(iss) 불일치");
             }
 
             if (!decodedJWT.getAudience().contains(googleClientId)) {
-                throw new RuntimeException("clientId(aud) 불일치");
+                throw new BusinessException(ErrorCode.UNAUTHORIZED, "clientId(aud) 불일치");
             }
 
             // exp(만료시간) 기본 검증
             if (decodedJWT.getExpiresAt().before(new Date())) {
-                throw new RuntimeException("ID Token이 만료되었습니다.");
+                throw new BusinessException(ErrorCode.UNAUTHORIZED, "ID Token이 만료되었습니다.");
             }
 
             // 3) payload 추출
@@ -75,8 +77,10 @@ public class GoogleCredentialVerifier {
                     .profileImageUrl(profileImageUrl)
                     .build();
 
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Google ID Token 검증 실패: " + e.getMessage());
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Google ID Token 검증 실패");
         }
     }
 }
