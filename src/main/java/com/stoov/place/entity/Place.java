@@ -1,6 +1,7 @@
 package com.stoov.place.entity;
 
 import com.stoov.common.entity.BaseEntity;
+import com.stoov.place.enums.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,7 +12,6 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
 
@@ -45,10 +45,6 @@ public class Place extends BaseEntity {
 	@Column(name = "lng", precision = 9, scale = 6, nullable = false)
 	private BigDecimal lng;
 
-	// Point 타입 필드
-	@Column(columnDefinition = "geography(Point, 4326)")
-	private Point location;
-
 	//장소 유형. ENUM 확정
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, length = 20)
@@ -67,8 +63,8 @@ public class Place extends BaseEntity {
 	private String operationTime;
 
 	//이용 가능 요일
-	@Column(name = "avilable_days")
-	private String avilableDays;
+	@Column(name = "available_days")
+	private String availableDays;
 
 	//이용 요금
 	@Enumerated(EnumType.STRING)
@@ -92,4 +88,3 @@ public class Place extends BaseEntity {
 	@Column(name = "thumbnail_url")
 	private String thumbnailUrl;
 }
-

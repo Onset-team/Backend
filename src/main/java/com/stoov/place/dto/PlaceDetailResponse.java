@@ -35,13 +35,13 @@ public record PlaceDetailResponse(
 			.address(place.getAddress())
 			.lat(place.getLat())
 			.lng(place.getLng())
-			.type(place.getType().name()) // Assuming PlaceType is an enum
+			.type(place.getType().getValue())
 			.contact(place.getContact())
 			.reservationUrl(place.getReservationUrl())
 			.operatingTime(place.getOperationTime())
-			.availableDays(place.getAvilableDays())
-			.fee(place.getFee().name()) // Assuming FeeType is an enum
-			.maxPerformers(place.getMaxPerformers().name()) // Assuming MaxPerformersType is an enum
+			.availableDays(place.getAvailableDays())
+			.fee(place.getFee().getValue())
+			.maxPerformers(place.getMaxPerformers().getValue())
 			.howToApply(place.getHowToApply())
 			.electricityAvailable(place.getElectricityAvailable())
 			.thumbnailUrl(place.getThumbnailUrl())
@@ -49,4 +49,3 @@ public record PlaceDetailResponse(
 			.build();
 	}
 }
-

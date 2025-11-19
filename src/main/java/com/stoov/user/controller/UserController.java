@@ -2,6 +2,8 @@ package com.stoov.user.controller;
 
 import java.util.UUID;
 
+import com.stoov.common.exception.BusinessException;
+import com.stoov.common.exception.ErrorCode;
 import com.stoov.common.response.CustomApiResponse;
 import com.stoov.user.dto.GoogleOAuthRequest;
 import com.stoov.user.dto.LoginResponse;
@@ -92,7 +94,7 @@ public class UserController {
 	private UUID requireUserId(LoginResponse response) {
 		UUID userId = response.getUserId();
 		if (userId == null) {
-			throw new IllegalStateException("LoginResponse에 userId가 비어 있음");
+			throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "LoginResponse에 userId가 비어 있음");
 		}
 		return userId;
 	}

@@ -4,6 +4,7 @@ import com.stoov.bookmark.repository.BookmarkRepository;
 import com.stoov.common.exception.BusinessException;
 import com.stoov.common.exception.ErrorCode;
 import com.stoov.place.dto.PlaceDetailResponse;
+import com.stoov.place.dto.PlaceResponse;
 import com.stoov.place.dto.PlaceSearchResponse;
 import com.stoov.place.entity.Place;
 import com.stoov.place.repository.PlaceRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -58,15 +60,45 @@ public class PlaceService {
 		Page<Place> places = placeRepository.searchByNameOrDistrict(searchKeyword, pageable);
 
 		return places.map(place -> {
+            // 후기 개수 들어갈 자리, 0으로 우선 하드코딩
+            int reviewCount = 0;
 			boolean isBookmarked = false;
 			if (userId != null) {
 				User user = userRepository.findById(userId)
 					.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 				isBookmarked = bookmarkRepository.findByUserAndPlace(user, place).isPresent();
 			}
-			return PlaceSearchResponse.of(place, isBookmarked);
+
+			return PlaceSearchResponse.of(place, reviewCount, isBookmarked);
 		});
 	}
+
+    /**
+     * 장소 목록 조회
+     */
+    public List<PlaceResponse> getAllPlaces(UUID userId) {
+        List<Place> places = placeRepository.findAll();
+        User user = null;
+
+        if (userId != null) {
+            user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        }
+        final User resolvedUser = user;
+        return places.stream()
+                .map(place -> {
+                    int reviewCount = 0;
+                    // 후기 갯수 집계 로직이 들어갈 자리, 우선은 하드코딩
+
+                    boolean isBookmarked = false;
+                    if (resolvedUser != null) {
+                        isBookmarked = bookmarkRepository.findByUserAndPlace(resolvedUser,place).isPresent();
+                    }
+
+                    return PlaceResponse.from(place, reviewCount, isBookmarked);
+                })
+                .toList();
+    }
 }
 
 

@@ -23,11 +23,16 @@ public class SecurityConfig {
             // 경로별 인가 설정
             .authorizeHttpRequests(authorize -> authorize
                 // 장소 검색 및 상세 조회는 누구나 접근 가능
+                .requestMatchers(HttpMethod.GET, "/api/places").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/places/**").permitAll()
+                // 마이페이지 조회는 로그인 여부와 상관없이 접근 가능 (비로그인 시 null 정보 반환)
+                .requestMatchers(HttpMethod.GET, "/api/users/my").permitAll()
                 // Google 로그인 경로는 누구나 접근 가능
                 .requestMatchers(HttpMethod.POST, "/api/users/google").permitAll()
                 // 그 외 모든 요청은 인증 필요
                 .anyRequest().authenticated()
+                //로컬 테스트용
+                //.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll()
             );
 
         return http.build();
