@@ -41,6 +41,14 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// PostGIS 의존성, PostgreSQL 드라이버 추가
+	implementation 'org.hibernate.orm:hibernate-spatial:6.5.2.Final'
+	implementation 'org.locationtech.jts:jts-core:1.19.0' // JTS Core Library
+	runtimeOnly 'org.postgresql:postgresql'
+
+	//offsetDatTime 매핑 추가
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 checkstyle {

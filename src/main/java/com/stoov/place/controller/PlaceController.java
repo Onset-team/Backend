@@ -1,0 +1,59 @@
+package com.stoov.place.controller;
+
+import com.stoov.common.dto.PageResponse;
+import com.stoov.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.stoov.common.response.CustomApiResponse;
+import com.stoov.place.dto.PlaceDetailResponse;
+import com.stoov.place.dto.PlaceSearchResponse;
+import com.stoov.place.service.PlaceService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/places")
+public class PlaceController {
+
+	private final PlaceService placeService;
+
+	/**
+	 * 장소 상세 정보 조회 API
+	 * [GET] /api/places/{placeId}
+	 */
+	@GetMapping("/{placeId}")
+	public ResponseEntity<CustomApiResponse<PlaceDetailResponse>> getPlaceDetail(
+		@PathVariable Long placeId,
+		@AuthenticationPrincipal User user) {
+
+		PlaceDetailResponse placeDetail = placeService.getPlaceDetail(placeId, user);
+		return ResponseEntity.ok(CustomApiResponse.success(placeDetail));
+	}
+
+	/**
+	 * 장소 검색 API
+	 * [GET] /api/places/search
+	 */
+	@GetMapping("/search")
+	public ResponseEntity<CustomApiResponse<PageResponse<PlaceSearchResponse>>> searchPlaces(
+		@RequestParam String keyword,
+		@AuthenticationPrincipal User user,
+		Pageable pageable) {
+
+		Page<PlaceSearchResponse> searchResults = placeService.searchPlaces(keyword, user, pageable);
+		// TODO: get blockSize, searchCenterLat, searchCenterLng from request or config
+		PageResponse<PlaceSearchResponse> pageResponse = new PageResponse<>(searchResults, 10, 0.0, 0.0);
+		return ResponseEntity.ok(CustomApiResponse.success(pageResponse));
+	}
+}
+
+
