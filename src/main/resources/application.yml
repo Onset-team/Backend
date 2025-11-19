@@ -1,0 +1,32 @@
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        #secure: true      # HTTPS만 쓴다면
+      timeout: 2h
+oauth2:
+  google:
+    client-id: "1039443017272-ddcqnf4elsi7sg60gucpqp7rngp8ci3g.apps.googleusercontent.com"
+
+# 데이터베이스(PostgreSQL) 연결 설정
+spring:
+  datasource:
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA 및 Hibernate 설정
+  jpa:
+    hibernate:
+      ddl-auto: update # 개발 단계에서는 update를 사용하고, 운영에서는 validate 또는 none을 권장합니다.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+# AWS S3 설정
+s3:
+  region: ${S3_REGION}
