@@ -1,11 +1,11 @@
 package com.stoov.place.controller;
 
 import com.stoov.common.dto.PageResponse;
-import com.stoov.user.entity.User;
+import com.stoov.user.helper.UserResolver;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +19,15 @@ import com.stoov.place.service.PlaceService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/places")
 public class PlaceController {
 
 	private final PlaceService placeService;
+	private final UserResolver userResolver;
 
 	/**
 	 * 장소 상세 정보 조회 API
@@ -33,9 +36,10 @@ public class PlaceController {
 	@GetMapping("/{placeId}")
 	public ResponseEntity<CustomApiResponse<PlaceDetailResponse>> getPlaceDetail(
 		@PathVariable Long placeId,
-		@AuthenticationPrincipal User user) {
+		HttpServletRequest request) {
 
-		PlaceDetailResponse placeDetail = placeService.getPlaceDetail(placeId, user);
+		UUID userId = userResolver.resolveUserId(request);
+		PlaceDetailResponse placeDetail = placeService.getPlaceDetail(placeId, userId);
 		return ResponseEntity.ok(CustomApiResponse.success(placeDetail));
 	}
 
@@ -46,12 +50,13 @@ public class PlaceController {
 	@GetMapping("/search")
 	public ResponseEntity<CustomApiResponse<PageResponse<PlaceSearchResponse>>> searchPlaces(
 		@RequestParam String keyword,
-		@AuthenticationPrincipal User user,
+		@RequestParam(defaultValue = "10") int blockSize,
+		HttpServletRequest request,
 		Pageable pageable) {
 
-		Page<PlaceSearchResponse> searchResults = placeService.searchPlaces(keyword, user, pageable);
-		// TODO: get blockSize, searchCenterLat, searchCenterLng from request or config
-		PageResponse<PlaceSearchResponse> pageResponse = new PageResponse<>(searchResults, 10, 0.0, 0.0);
+		UUID userId = userResolver.resolveUserId(request);
+		Page<PlaceSearchResponse> searchResults = placeService.searchPlaces(keyword, userId, pageable);
+		PageResponse<PlaceSearchResponse> pageResponse = new PageResponse<>(searchResults, blockSize);
 		return ResponseEntity.ok(CustomApiResponse.success(pageResponse));
 	}
 }

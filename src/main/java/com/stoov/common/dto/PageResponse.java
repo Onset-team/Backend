@@ -48,7 +48,7 @@ public class PageResponse<T> {
 	private boolean isLast;
 
 
-	public PageResponse(Page<T> page, int blockSize, double searchCenterLat, double searchCenterLng) {
+	public PageResponse(Page<T> page, int blockSize) {
 		this.content = page.getContent();
 		this.currentPage = page.getNumber() + 1;
 

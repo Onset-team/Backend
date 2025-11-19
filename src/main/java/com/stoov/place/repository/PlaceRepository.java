@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
-    @Query("SELECT p FROM Place p WHERE REPLACE(p.name, ' ', '') LIKE %:keyword% OR REPLACE(p.district, ' ', '') LIKE %:keyword%")
+    @Query("SELECT p FROM Place p WHERE p.name LIKE :keyword OR p.district LIKE :keyword")
     Page<Place> searchByNameOrDistrict(@Param("keyword") String keyword, Pageable pageable);
 }

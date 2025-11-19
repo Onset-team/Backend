@@ -27,7 +27,10 @@ public enum ErrorCode {
 
 	//Bookmark
 	ALREADY_BOOKMARKED(HttpStatus.CONFLICT, "BM001", "이미 즐겨찾기에 추가된 장소입니다."),
-	BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "BM002", "즐겨찾기를 찾을 수 없습니다.");
+	BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "BM002", "즐겨찾기를 찾을 수 없습니다."),
+
+	//User
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 사용자를 찾을 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

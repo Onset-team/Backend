@@ -1,17 +1,21 @@
 package com.stoov.bookmark.controller;
 
 import com.stoov.bookmark.service.BookmarkService;
+import com.stoov.common.exception.BusinessException;
+import com.stoov.common.exception.ErrorCode;
 import com.stoov.common.response.CustomApiResponse;
-import com.stoov.user.entity.User;
+import com.stoov.user.helper.UserResolver;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,23 +23,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookmarkController {
 
     private final BookmarkService bookmarkService;
+    private final UserResolver userResolver;
 
     @PostMapping
     public ResponseEntity<CustomApiResponse<?>> addBookmark(
             @PathVariable Long placeId,
-            @AuthenticationPrincipal User user) {
-        // Assuming User object is directly available from the principal
-        // If not, this needs to be adjusted based on the actual UserDetails implementation
-        bookmarkService.addBookmark(placeId, user);
+            HttpServletRequest request) {
+        UUID userId = userResolver.resolveUserId(request);
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        bookmarkService.addBookmark(placeId, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success());
     }
 
     @DeleteMapping
     public ResponseEntity<CustomApiResponse<?>> deleteBookmark(
             @PathVariable Long placeId,
-            @AuthenticationPrincipal User user) {
-        // Assuming User object is directly available from the principal
-        bookmarkService.deleteBookmark(placeId, user);
+            HttpServletRequest request) {
+        UUID userId = userResolver.resolveUserId(request);
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        bookmarkService.deleteBookmark(placeId, userId);
         return ResponseEntity.ok(CustomApiResponse.success());
     }
 }

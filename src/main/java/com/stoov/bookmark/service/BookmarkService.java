@@ -7,9 +7,12 @@ import com.stoov.common.exception.ErrorCode;
 import com.stoov.place.entity.Place;
 import com.stoov.place.repository.PlaceRepository;
 import com.stoov.user.entity.User;
+import com.stoov.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,9 +20,12 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final PlaceRepository placeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public void addBookmark(Long placeId, User user) {
+    public void addBookmark(Long placeId, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
@@ -35,7 +41,9 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(Long placeId, User user) {
+    public void deleteBookmark(Long placeId, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
