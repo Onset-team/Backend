@@ -11,6 +11,8 @@ public record PlaceSearchResponse(
 	BigDecimal lat,
 	BigDecimal lng,
 	String address,
+	String type,
+	String thumbnailUrl,
 	boolean bookmarked
 ) {
 
@@ -25,6 +27,8 @@ public record PlaceSearchResponse(
 			.lat(place.getLat())
 			.lng(place.getLng())
 			.address(place.getAddress())
+			.type(place.getType().name())
+			.thumbnailUrl(place.getThumbnailUrl())
 			.bookmarked(bookmarked)
 			.build();
 	}

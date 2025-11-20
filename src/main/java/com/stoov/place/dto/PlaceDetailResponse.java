@@ -39,7 +39,7 @@ public record PlaceDetailResponse(
 			.contact(place.getContact())
 			.reservationUrl(place.getReservationUrl())
 			.operatingTime(place.getOperationTime())
-			.availableDays(place.getAvilableDays())
+			.availableDays(place.getAvailableDays())
 			.fee(place.getFee().name()) // Assuming FeeType is an enum
 			.maxPerformers(place.getMaxPerformers().name()) // Assuming MaxPerformersType is an enum
 			.howToApply(place.getHowToApply())

@@ -1,13 +1,19 @@
 package com.stoov.place.controller;
 
+import com.stoov.bookmark.service.BookmarkService;
 import com.stoov.common.dto.PageResponse;
+import com.stoov.common.exception.BusinessException;
+import com.stoov.common.exception.ErrorCode;
 import com.stoov.user.helper.UserResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +33,8 @@ import java.util.UUID;
 public class PlaceController {
 
 	private final PlaceService placeService;
+	private final BookmarkService bookmarkService;
 	private final UserResolver userResolver;
-
 	/**
 	 * 장소 상세 정보 조회 API
 	 * [GET] /api/places/{placeId}
@@ -58,6 +64,42 @@ public class PlaceController {
 		Page<PlaceSearchResponse> searchResults = placeService.searchPlaces(keyword, userId, pageable);
 		PageResponse<PlaceSearchResponse> pageResponse = new PageResponse<>(searchResults, blockSize);
 		return ResponseEntity.ok(CustomApiResponse.success(pageResponse));
+	}
+
+	/**
+	 * 관심 장소 등록
+	 * @param placeId
+	 * @param request
+	 * @return
+	 */
+	@PostMapping("/{placeId}/bookmarks")
+	public ResponseEntity<CustomApiResponse<?>> addBookmark(
+		@PathVariable Long placeId,
+		HttpServletRequest request) {
+		UUID userId = userResolver.resolveUserId(request);
+		if (userId == null) {
+			throw new BusinessException(ErrorCode.UNAUTHORIZED);
+		}
+		bookmarkService.addBookmark(placeId, userId);
+		return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success());
+	}
+
+	/**
+	 * 관심 장소 해제
+	 * @param placeId
+	 * @param request
+	 * @return
+	 */
+	@DeleteMapping("/{placeId}/bookmarks")
+	public ResponseEntity<CustomApiResponse<?>> deleteBookmark(
+		@PathVariable Long placeId,
+		HttpServletRequest request) {
+		UUID userId = userResolver.resolveUserId(request);
+		if (userId == null) {
+			throw new BusinessException(ErrorCode.UNAUTHORIZED);
+		}
+		bookmarkService.deleteBookmark(placeId, userId);
+		return ResponseEntity.ok(CustomApiResponse.success());
 	}
 }
 

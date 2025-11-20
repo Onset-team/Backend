@@ -67,8 +67,8 @@ public class Place extends BaseEntity {
 	private String operationTime;
 
 	//이용 가능 요일
-	@Column(name = "avilable_days")
-	private String avilableDays;
+	@Column(name = "available_days")
+	private String availableDays;
 
 	//이용 요금
 	@Enumerated(EnumType.STRING)
