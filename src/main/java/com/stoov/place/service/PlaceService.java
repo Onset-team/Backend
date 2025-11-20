@@ -8,6 +8,7 @@ import com.stoov.place.dto.PlaceResponse;
 import com.stoov.place.dto.PlaceSearchResponse;
 import com.stoov.place.entity.Place;
 import com.stoov.place.repository.PlaceRepository;
+import com.stoov.review.repository.ReviewRepository;
 import com.stoov.user.entity.User;
 import com.stoov.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class PlaceService {
 	private final PlaceRepository placeRepository;
 	private final BookmarkRepository bookmarkRepository;
 	private final UserRepository userRepository;
+	private final ReviewRepository reviewRepository;
 
 	/**
 	 * 장소 데이터 상세 조회
@@ -60,8 +62,7 @@ public class PlaceService {
 		Page<Place> places = placeRepository.searchByNameOrDistrict(searchKeyword, pageable);
 
 		return places.map(place -> {
-            // 후기 개수 들어갈 자리, 0으로 우선 하드코딩
-            int reviewCount = 0;
+            int reviewCount = (int) reviewRepository.countByPlace(place);
 			boolean isBookmarked = false;
 			if (userId != null) {
 				User user = userRepository.findById(userId)
@@ -76,6 +77,7 @@ public class PlaceService {
     /**
      * 장소 목록 조회
      */
+    @Transactional(readOnly = true) // 추가
     public List<PlaceResponse> getAllPlaces(UUID userId) {
         List<Place> places = placeRepository.findAll();
         User user = null;
@@ -87,8 +89,7 @@ public class PlaceService {
         final User resolvedUser = user;
         return places.stream()
                 .map(place -> {
-                    int reviewCount = 0;
-                    // 후기 갯수 집계 로직이 들어갈 자리, 우선은 하드코딩
+                    int reviewCount = (int) reviewRepository.countByPlace(place); // 수정
 
                     boolean isBookmarked = false;
                     if (resolvedUser != null) {
@@ -100,5 +101,3 @@ public class PlaceService {
                 .toList();
     }
 }
-
-

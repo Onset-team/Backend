@@ -28,7 +28,7 @@ public record BookmarkResponse(
             .lat(place.getLat())
             .lng(place.getLng())
             .address(place.getAddress())
-            .type(place.getType().name())
+            .type(place.getType().getValue())
             .reviewCount(reviewCount)
             .thumbnailUrl(place.getThumbnailUrl())
             .bookmarked(true)
