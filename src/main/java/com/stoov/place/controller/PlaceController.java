@@ -4,8 +4,14 @@ import com.stoov.bookmark.service.BookmarkService;
 import com.stoov.common.dto.PageResponse;
 import com.stoov.common.exception.BusinessException;
 import com.stoov.common.exception.ErrorCode;
+import com.stoov.review.dto.ReviewCreateRequest;
+import com.stoov.review.dto.ReviewCreateResponse;
+import com.stoov.review.dto.ReviewListResponse;
+import com.stoov.review.service.ReviewService;
 import com.stoov.user.helper.UserResolver;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +32,7 @@ import com.stoov.place.service.PlaceService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,6 +42,7 @@ public class PlaceController {
 
 	private final PlaceService placeService;
 	private final BookmarkService bookmarkService;
+	private final ReviewService reviewService;
 	private final UserResolver userResolver;
 	/**
 	 * 장소 상세 정보 조회 API
@@ -100,6 +109,37 @@ public class PlaceController {
 		}
 		bookmarkService.deleteBookmark(placeId, userId);
 		return ResponseEntity.ok(CustomApiResponse.success());
+	}
+
+	/**
+	 *
+	 * @param placeId
+	 * @param requestDto
+	 * @param request
+	 * @return
+	 */
+	@PostMapping("/api/places/{placeId}/reviews")
+	public ResponseEntity<CustomApiResponse<ReviewCreateResponse>> createReview(
+		@PathVariable Long placeId,
+		@RequestBody @Valid ReviewCreateRequest requestDto,
+		HttpServletRequest request) {
+		UUID userId = userResolver.resolveUserId(request);
+		ReviewCreateResponse response = reviewService.createReview(placeId, userId, requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success(response));
+	}
+
+	@GetMapping("/api/places/{placeId}/reviews")
+	public ResponseEntity<CustomApiResponse<List<ReviewListResponse>>> getReviews(
+		@PathVariable Long placeId,
+		HttpServletRequest request) {
+		UUID userId = null;
+		try {
+			userId = userResolver.resolveUserId(request);
+		} catch (BusinessException e) {
+			// 비로그인 사용자의 경우 userId는 null로 유지
+		}
+		List<ReviewListResponse> response = reviewService.getReviews(placeId, userId);
+		return ResponseEntity.ok(CustomApiResponse.success(response));
 	}
 }
 
