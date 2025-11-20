@@ -2,27 +2,25 @@ package com.stoov.place.dto;
 
 import com.stoov.place.entity.Place;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
-public record PlaceSearchResponse(
-        Long placeId,
-        String name,
-        BigDecimal lat,
-        BigDecimal lng,
-        String address,
-        String type,
-        int reviewCount,
-        String thumbnailUrl,
-        boolean bookmarked
-) {
+@Getter
+@Builder
+public class PlaceResponse {
+    private Long placeId;
+    private String name;
+    private BigDecimal lat;
+    private BigDecimal lng;
+    private String address;
+    private String type;
+    private int reviewCount;
+    private String thumbnailUrl;
+    private boolean bookmarked;
 
-	@Builder
-	public PlaceSearchResponse {
-	}
-
-	public static PlaceSearchResponse of(Place place, int reviewCount, boolean bookmarked) {
-		return PlaceSearchResponse.builder()
+    public static PlaceResponse from(Place place, int reviewCount, boolean bookmarked) {
+        return PlaceResponse.builder()
                 .placeId(place.getId())
                 .name(place.getName())
                 .lat(place.getLat())
@@ -33,5 +31,5 @@ public record PlaceSearchResponse(
                 .thumbnailUrl(place.getThumbnailUrl())
                 .bookmarked(bookmarked)
                 .build();
-	}
+    }
 }

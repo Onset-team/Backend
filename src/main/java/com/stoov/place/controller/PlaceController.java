@@ -8,6 +8,7 @@ import com.stoov.review.dto.ReviewCreateRequest;
 import com.stoov.review.dto.ReviewCreateResponse;
 import com.stoov.review.dto.ReviewListResponse;
 import com.stoov.review.service.ReviewService;
+import com.stoov.place.dto.PlaceResponse;
 import com.stoov.user.helper.UserResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -141,6 +142,15 @@ public class PlaceController {
 		List<ReviewListResponse> response = reviewService.getReviews(placeId, userId);
 		return ResponseEntity.ok(CustomApiResponse.success(response));
 	}
+
+    @GetMapping
+    public ResponseEntity<CustomApiResponse<List<PlaceResponse>>> getAllPlaces(
+            HttpServletRequest request) {
+
+        UUID userId = userResolver.resolveUserId(request);
+        List<PlaceResponse> response = placeService.getAllPlaces(userId);
+        return ResponseEntity.ok(CustomApiResponse.success(response));
+    }
 }
 
 
