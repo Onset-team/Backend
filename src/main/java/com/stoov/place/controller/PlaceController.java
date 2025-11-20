@@ -113,13 +113,13 @@ public class PlaceController {
 	}
 
 	/**
-	 *
+	 * 후기 작성
 	 * @param placeId
 	 * @param requestDto
 	 * @param request
 	 * @return
 	 */
-	@PostMapping("/api/places/{placeId}/reviews")
+	@PostMapping("/{placeId}/reviews")
 	public ResponseEntity<CustomApiResponse<ReviewCreateResponse>> createReview(
 		@PathVariable Long placeId,
 		@RequestBody @Valid ReviewCreateRequest requestDto,
@@ -129,7 +129,13 @@ public class PlaceController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success(response));
 	}
 
-	@GetMapping("/api/places/{placeId}/reviews")
+	/**
+	 * 후기 목록 조회
+	 * @param placeId
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/{placeId}/reviews")
 	public ResponseEntity<CustomApiResponse<List<ReviewListResponse>>> getReviews(
 		@PathVariable Long placeId,
 		HttpServletRequest request) {
