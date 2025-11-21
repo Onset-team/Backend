@@ -49,3 +49,4 @@ public record PlaceDetailResponse(
 			.build();
 	}
 }
+

@@ -3,18 +3,32 @@ package com.stoov.common.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import com.stoov.common.exception.ErrorCode;
+import com.stoov.common.response.CustomApiResponse;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
@@ -32,8 +46,8 @@ public class SecurityConfig {
                 // 헬스체크는 항상 허용
                 .requestMatchers("/actuator/health", "/health").permitAll()
                 // 장소 검색 및 상세 조회는 누구나 접근 가능
-                .requestMatchers(HttpMethod.GET, "/api/places").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/places/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/places/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/places/{placeId}").permitAll()
                 // 마이페이지 조회는 로그인 여부와 상관없이 접근 가능 (비로그인 시 null 정보 반환)
                 .requestMatchers(HttpMethod.GET, "/api/users/my").permitAll()
                 // Google 로그인 경로는 누구나 접근 가능
@@ -42,6 +56,28 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 //로컬 테스트용
                 //.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    try (OutputStream os = response.getOutputStream()) {
+                        objectMapper.writeValue(os, CustomApiResponse.error(ErrorCode.UNAUTHORIZED));
+                        os.flush();
+                    } catch (IOException e) {
+                        // 로깅 필요
+                    }
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    try (OutputStream os = response.getOutputStream()) {
+                        objectMapper.writeValue(os, CustomApiResponse.error(ErrorCode.FORBIDDEN));
+                        os.flush();
+                    } catch (IOException e) {
+                        // 로깅 필요
+                    }
+                })
             );
 
         return http.build();
