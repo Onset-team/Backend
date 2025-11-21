@@ -6,6 +6,7 @@ import com.stoov.place.entity.Place;
 import com.stoov.place.repository.PlaceRepository;
 import com.stoov.review.dto.ReviewCreateRequest;
 import com.stoov.review.dto.ReviewCreateResponse;
+import com.stoov.review.dto.ReviewUpdateResponse;
 import com.stoov.review.dto.ReviewListResponse;
 import com.stoov.review.dto.ReviewUpdateRequest;
 import com.stoov.review.entity.Review;
@@ -74,7 +75,7 @@ public class ReviewService {
      * 리뷰 수정
      */
     @Transactional
-    public ReviewCreateResponse updateReview(Long reviewId, UUID userId, ReviewUpdateRequest request) {
+    public ReviewUpdateResponse updateReview(Long reviewId, UUID userId, ReviewUpdateRequest request) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 
@@ -82,9 +83,9 @@ public class ReviewService {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        review.updateContent(request.content()); // Review 엔티티에 updateContent 메서드 필요
+        review.updateContent(request.content());
 
-        return ReviewCreateResponse.of(review);
+        return ReviewUpdateResponse.of(review);
     }
 
     /**

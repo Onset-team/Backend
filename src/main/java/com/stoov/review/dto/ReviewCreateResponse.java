@@ -10,8 +10,7 @@ public record ReviewCreateResponse(
     Long reviewId,
     String nickname,
     String content,
-    OffsetDateTime createdAt,
-    OffsetDateTime updatedAt
+    OffsetDateTime createdAt
 ) {
     public static ReviewCreateResponse of(Review review) {
         return ReviewCreateResponse.builder()
@@ -19,7 +18,6 @@ public record ReviewCreateResponse(
             .nickname(review.getUser().getMaskedNickname())
             .content(review.getContent())
             .createdAt(review.getCreatedAt())
-            .updatedAt(review.getUpdatedAt())
             .build();
     }
 }
