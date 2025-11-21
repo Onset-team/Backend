@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
-        return MyPageResponse.from(user.getNickname(), user.getProfileImageUrl());
+        return MyPageResponse.from(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
 
     //프로필 수정. 형태만 일단 갖추고, 제대로 된 업데이트는 MVP 이후에
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
         String url = uploadProfileImage(userId, file);
         user.setProfileImageUrl(url);
 
-        return MyPageResponse.from(user.getNickname(), user.getProfileImageUrl());
+        return MyPageResponse.from(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
 
     //프로필 이미지 업로드용 내부 메서드, 추후 이미지 업로드를 확장한다면 별도 클래스로 분리
