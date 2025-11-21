@@ -32,7 +32,7 @@ public class BookmarkController {
      */
     @GetMapping
     public ResponseEntity<CustomApiResponse<List<BookmarkResponse>>> getBookmark(HttpServletRequest request) {
-        UUID userId = userResolver.resolveUserId(request);
+        UUID userId = userResolver.resolveRequiredUserId(request);
         return ResponseEntity.ok(CustomApiResponse.success(bookmarkService.getBookmark(userId)));
     }
 }

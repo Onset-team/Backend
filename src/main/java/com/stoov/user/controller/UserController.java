@@ -49,7 +49,7 @@ public class UserController {
 
     @PostMapping("/agreements")
     public ResponseEntity<CustomApiResponse<?>> saveUserAgreement(HttpServletRequest httpServletRequest) {
-        UUID userId = userResolver.resolveUserId(httpServletRequest);
+        UUID userId = userResolver.resolveRequiredUserId(httpServletRequest);
         userService.saveUserAgreement(userId);
         return ResponseEntity.ok(CustomApiResponse.success());
     }
@@ -58,7 +58,7 @@ public class UserController {
     public ResponseEntity<CustomApiResponse<MyPageResponse>> getMyPage(
             HttpServletRequest httpServletRequest
     ){
-        UUID userId = userResolver.resolveUserId(httpServletRequest);
+        UUID userId = userResolver.resolveUserIdOrNull(httpServletRequest);
         MyPageResponse response = userService.getMyPage(userId);
 
         return ResponseEntity.ok(CustomApiResponse.success(response));
@@ -69,7 +69,7 @@ public class UserController {
             HttpServletRequest request,
             @RequestParam("file") MultipartFile file
     ) {
-        UUID userId = userResolver.resolveUserId(request); // 세션에서 userId 가져옴
+        UUID userId = userResolver.resolveRequiredUserId(request);
         MyPageResponse response = userService.updateMyProfileImage(userId, file);
 
         return ResponseEntity.ok(CustomApiResponse.success(response));
@@ -77,7 +77,7 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<Void> deleteUser(HttpServletRequest httpServletRequest) {
-        UUID userId = userResolver.resolveUserId(httpServletRequest);
+        UUID userId = userResolver.resolveRequiredUserId(httpServletRequest);
         userService.deleteUser(userId);
 
         return ResponseEntity.noContent().build();
