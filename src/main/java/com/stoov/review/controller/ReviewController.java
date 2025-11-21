@@ -1,8 +1,8 @@
 package com.stoov.review.controller;
 
 import com.stoov.common.response.CustomApiResponse;
-import com.stoov.review.dto.ReviewCreateResponse;
 import com.stoov.review.dto.ReviewUpdateRequest;
+import com.stoov.review.dto.ReviewUpdateResponse;
 import com.stoov.review.service.ReviewService;
 import com.stoov.user.helper.UserResolver;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,12 +34,12 @@ public class ReviewController {
      * @return
      */
     @PatchMapping("/{reviewId}")
-    public ResponseEntity<CustomApiResponse<ReviewCreateResponse>> updateReview(
+    public ResponseEntity<CustomApiResponse<ReviewUpdateResponse>> updateReview(
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewUpdateRequest requestDto,
             HttpServletRequest request) {
         UUID userId = userResolver.resolveRequiredUserId(request);
-        ReviewCreateResponse response = reviewService.updateReview(reviewId, userId, requestDto);
+        ReviewUpdateResponse response = reviewService.updateReview(reviewId, userId, requestDto);
         return ResponseEntity.ok(CustomApiResponse.success(response));
     }
 
