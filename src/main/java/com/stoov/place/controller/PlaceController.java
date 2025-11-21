@@ -2,8 +2,6 @@ package com.stoov.place.controller;
 
 import com.stoov.bookmark.service.BookmarkService;
 import com.stoov.common.dto.PageResponse;
-import com.stoov.common.exception.BusinessException;
-import com.stoov.common.exception.ErrorCode;
 import com.stoov.review.dto.ReviewCreateRequest;
 import com.stoov.review.dto.ReviewCreateResponse;
 import com.stoov.review.dto.ReviewListResponse;
@@ -54,7 +52,7 @@ public class PlaceController {
 		@PathVariable Long placeId,
 		HttpServletRequest request) {
 
-		UUID userId = userResolver.resolveUserId(request);
+		UUID userId = userResolver.resolveUserIdOrNull(request);
 		PlaceDetailResponse placeDetail = placeService.getPlaceDetail(placeId, userId);
 		return ResponseEntity.ok(CustomApiResponse.success(placeDetail));
 	}
@@ -70,7 +68,7 @@ public class PlaceController {
 		HttpServletRequest request,
 		Pageable pageable) {
 
-		UUID userId = userResolver.resolveUserId(request);
+		UUID userId = userResolver.resolveUserIdOrNull(request);
 		Page<PlaceSearchResponse> searchResults = placeService.searchPlaces(keyword, userId, pageable);
 		PageResponse<PlaceSearchResponse> pageResponse = new PageResponse<>(searchResults, blockSize);
 		return ResponseEntity.ok(CustomApiResponse.success(pageResponse));
@@ -86,10 +84,7 @@ public class PlaceController {
 	public ResponseEntity<CustomApiResponse<?>> addBookmark(
 		@PathVariable Long placeId,
 		HttpServletRequest request) {
-		UUID userId = userResolver.resolveUserId(request);
-		if (userId == null) {
-			throw new BusinessException(ErrorCode.UNAUTHORIZED);
-		}
+		UUID userId = userResolver.resolveRequiredUserId(request);
 		bookmarkService.addBookmark(placeId, userId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success());
 	}
@@ -104,10 +99,7 @@ public class PlaceController {
 	public ResponseEntity<CustomApiResponse<?>> deleteBookmark(
 		@PathVariable Long placeId,
 		HttpServletRequest request) {
-		UUID userId = userResolver.resolveUserId(request);
-		if (userId == null) {
-			throw new BusinessException(ErrorCode.UNAUTHORIZED);
-		}
+		UUID userId = userResolver.resolveRequiredUserId(request);
 		bookmarkService.deleteBookmark(placeId, userId);
 		return ResponseEntity.ok(CustomApiResponse.success());
 	}
@@ -124,7 +116,7 @@ public class PlaceController {
 		@PathVariable Long placeId,
 		@RequestBody @Valid ReviewCreateRequest requestDto,
 		HttpServletRequest request) {
-		UUID userId = userResolver.resolveUserId(request);
+		UUID userId = userResolver.resolveRequiredUserId(request);
 		ReviewCreateResponse response = reviewService.createReview(placeId, userId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success(response));
 	}
@@ -139,12 +131,7 @@ public class PlaceController {
 	public ResponseEntity<CustomApiResponse<List<ReviewListResponse>>> getReviews(
 		@PathVariable Long placeId,
 		HttpServletRequest request) {
-		UUID userId = null;
-		try {
-			userId = userResolver.resolveUserId(request);
-		} catch (BusinessException e) {
-			// 비로그인 사용자의 경우 userId는 null로 유지
-		}
+		UUID userId = userResolver.resolveUserIdOrNull(request);
 		List<ReviewListResponse> response = reviewService.getReviews(placeId, userId);
 		return ResponseEntity.ok(CustomApiResponse.success(response));
 	}
@@ -153,10 +140,8 @@ public class PlaceController {
     public ResponseEntity<CustomApiResponse<List<PlaceResponse>>> getAllPlaces(
             HttpServletRequest request) {
 
-        UUID userId = userResolver.resolveUserId(request);
+        UUID userId = userResolver.resolveUserIdOrNull(request);
         List<PlaceResponse> response = placeService.getAllPlaces(userId);
         return ResponseEntity.ok(CustomApiResponse.success(response));
     }
 }
-
-

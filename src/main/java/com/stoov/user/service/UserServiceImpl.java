@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public MyPageResponse updateMyProfileImage(UUID userId, MultipartFile file) {
         if (userId == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND);
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
         if (file == null || file.isEmpty()) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(UUID userId) {
         if (userId == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND);
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
