@@ -4,6 +4,7 @@ import com.stoov.bookmark.service.BookmarkService;
 import com.stoov.common.dto.PageResponse;
 import com.stoov.review.dto.ReviewCreateRequest;
 import com.stoov.review.dto.ReviewCreateResponse;
+import com.stoov.review.dto.ReviewUpdateResponse;
 import com.stoov.review.dto.ReviewListResponse;
 import com.stoov.review.service.ReviewService;
 import com.stoov.place.dto.PlaceResponse;
