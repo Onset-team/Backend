@@ -62,7 +62,7 @@ public class PlaceService {
 		Page<Place> places = placeRepository.searchByNameOrDistrict(searchKeyword, pageable);
 
 		return places.map(place -> {
-            int reviewCount = (int) reviewRepository.countByPlace(place);
+			int reviewCount = (int) reviewRepository.countByPlace(place);
 			boolean isBookmarked = false;
 			if (userId != null) {
 				User user = userRepository.findById(userId)
@@ -74,30 +74,30 @@ public class PlaceService {
 		});
 	}
 
-    /**
-     * 장소 목록 조회
-     */
-    @Transactional(readOnly = true) // 추가
-    public List<PlaceResponse> getAllPlaces(UUID userId) {
-        List<Place> places = placeRepository.findAll();
-        User user = null;
+	/**
+	 * 장소 목록 조회
+	 */
+	@Transactional(readOnly = true) // 추가
+	public List<PlaceResponse> getAllPlaces(UUID userId) {
+		List<Place> places = placeRepository.findAll();
+		User user = null;
 
-        if (userId != null) {
-            user = userRepository.findById(userId)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        }
-        final User resolvedUser = user;
-        return places.stream()
-                .map(place -> {
-                    int reviewCount = (int) reviewRepository.countByPlace(place); // 수정
+		if (userId != null) {
+			user = userRepository.findById(userId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+		}
+		final User resolvedUser = user;
+		return places.stream()
+			.map(place -> {
+				int reviewCount = (int) reviewRepository.countByPlace(place); // 수정
 
-                    boolean isBookmarked = false;
-                    if (resolvedUser != null) {
-                        isBookmarked = bookmarkRepository.findByUserAndPlace(resolvedUser,place).isPresent();
-                    }
+				boolean isBookmarked = false;
+				if (resolvedUser != null) {
+					isBookmarked = bookmarkRepository.findByUserAndPlace(resolvedUser,place).isPresent();
+				}
 
-                    return PlaceResponse.from(place, reviewCount, isBookmarked);
-                })
-                .toList();
-    }
+				return PlaceResponse.from(place, reviewCount, isBookmarked);
+			})
+			.toList();
+	}
 }
