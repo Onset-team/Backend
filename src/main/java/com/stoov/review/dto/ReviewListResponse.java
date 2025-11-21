@@ -16,7 +16,7 @@ public record ReviewListResponse(
         boolean isMyReview = review.getUser().getId().equals(currentUserId);
         return ReviewListResponse.builder()
                 .reviewId(review.getId())
-                .nickname(review.getUser().getNickname())
+                .nickname(review.getUser().getMaskedNickname())
                 .content(review.getContent())
                 .isMyReview(isMyReview)
                 .build();
@@ -25,7 +25,7 @@ public record ReviewListResponse(
     public static ReviewListResponse of(Review review) {
         return ReviewListResponse.builder()
                 .reviewId(review.getId())
-                .nickname(review.getUser().getNickname())
+                .nickname(review.getUser().getMaskedNickname())
                 .content(review.getContent())
                 .isMyReview(false)
                 .build();
