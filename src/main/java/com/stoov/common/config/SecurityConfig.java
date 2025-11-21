@@ -46,8 +46,8 @@ public class SecurityConfig {
                 // 헬스체크는 항상 허용
                 .requestMatchers("/actuator/health", "/health").permitAll()
                 // 장소 검색 및 상세 조회는 누구나 접근 가능
-                .requestMatchers(HttpMethod.GET, "/api/places/search").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/places/{placeId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/places").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/places/**").permitAll()
                 // 마이페이지 조회는 로그인 여부와 상관없이 접근 가능 (비로그인 시 null 정보 반환)
                 .requestMatchers(HttpMethod.GET, "/api/users/my").permitAll()
                 // Google 로그인 경로는 누구나 접근 가능
