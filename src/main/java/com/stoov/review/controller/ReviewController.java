@@ -38,7 +38,7 @@ public class ReviewController {
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewUpdateRequest requestDto,
             HttpServletRequest request) {
-        UUID userId = userResolver.resolveUserId(request);
+        UUID userId = userResolver.resolveRequiredUserId(request);
         ReviewCreateResponse response = reviewService.updateReview(reviewId, userId, requestDto);
         return ResponseEntity.ok(CustomApiResponse.success(response));
     }
@@ -53,7 +53,7 @@ public class ReviewController {
     public ResponseEntity<CustomApiResponse<Void>> deleteReview(
             @PathVariable Long reviewId,
             HttpServletRequest request) {
-        UUID userId = userResolver.resolveUserId(request);
+        UUID userId = userResolver.resolveRequiredUserId(request);
         reviewService.deleteReview(reviewId, userId);
         return ResponseEntity.ok(CustomApiResponse.success(null));
     }
