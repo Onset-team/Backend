@@ -12,7 +12,7 @@ public record ReviewCreateResponse(
     public static ReviewCreateResponse of(Review review) {
         return ReviewCreateResponse.builder()
             .reviewId(review.getId())
-            .nickname(review.getUser().getNickname())
+            .nickname(review.getUser().getMaskedNickname())
             .content(review.getContent())
             .build();
     }
