@@ -9,5 +9,5 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     long countByPlace(Place place);
-    List<Review> findAllByPlace(Place place);
+    List<Review> findAllByPlaceOrderByCreatedAtDesc(Place place);
 }
