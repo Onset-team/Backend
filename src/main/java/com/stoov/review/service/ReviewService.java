@@ -58,7 +58,7 @@ public class ReviewService {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
-        List<Review> reviews = reviewRepository.findAllByPlace(place);
+        List<Review> reviews = reviewRepository.findAllByPlaceOrderByCreatedAtDesc(place);
 
         if (userId == null) {
             return reviews.stream()
