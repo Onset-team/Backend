@@ -17,8 +17,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_batch_fetch_size: 100 # LAZY 연관 로딩할 때 최대 100개씩 묶어서 쿼리로 가져오게 하는 옵션
     show-sql: true
-
+  logging: #추가가가
+    level:
+      org.hibernate.SQL: debug
+      org.hibernate.type.descriptor.sql.BasicBinder: trace
 server:
   servlet:
     session:
