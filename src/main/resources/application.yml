@@ -77,3 +77,4 @@ app:
   cors:
     allowed-origins:
       - "https://stoo-v.com"
+      - "http://localhost:5173"
