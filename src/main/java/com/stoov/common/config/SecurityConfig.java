@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -28,9 +27,6 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final ObjectMapper objectMapper;
-
-	@Value("${app.cors.allowed-origins}")
-	private List<String> allowedOrigins;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource)
@@ -72,7 +68,10 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(allowedOrigins);
+		configuration.setAllowedOrigins(List.of(
+			"https://stoo-v.com",
+			"http://localhost:5173"
+		));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
