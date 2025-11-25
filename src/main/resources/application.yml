@@ -65,4 +65,3 @@ server:
       cookie:
         secure: true
         same-site: lax
-        domain: .stoo-v.com
