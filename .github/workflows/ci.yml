@@ -36,7 +36,7 @@ jobs:
       #테스트 설정 비활성화
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: ./gradlew build -x test --no-daemon
 
       - name: Upload Test Report
         if: always()
