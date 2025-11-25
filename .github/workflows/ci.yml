@@ -33,8 +33,7 @@ jobs:
       - name: Run Checkstyle
         run: ./gradlew checkstyleMain
 
-      - name: Run tests
-        run: ./gradlew test
+      #테스트 설정 비활성화
 
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
