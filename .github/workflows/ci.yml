@@ -1,0 +1,48 @@
+# 현재는 H2 테스트만으로 진행함
+# PostGIS 공간 데이터 활용하는 프로젝트로 고도화되었을 때
+# 실제 PostgreSQL 컨테이너를 연동하는 통합 테스트를 추가하는 방향으로 추후 확장
+name: STOOV Java CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'           # Gradle 캐시 활성화
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Checkstyle
+        run: ./gradlew checkstyleMain
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/test/
+          if-no-files-found: warn
