@@ -23,6 +23,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         select r.place.id, count(r)
         from Review r
         where r.place in :places
+        and r.user is not null
         group by r.place.id
         """)
     List<Object[]> countByPlaces(@Param("places") List<Place> places);
