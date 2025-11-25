@@ -15,4 +15,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     void deleteByUserAndPlace(User user, Place place);
 
     List<Bookmark> findAllByUser(User user);
+
+    // 특정 유저가 여러 장소를 북마크했는지 한 번에 조회
+    List<Bookmark> findByUserAndPlaceIn(User user, List<Place> places);
 }

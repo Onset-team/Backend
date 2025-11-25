@@ -60,13 +60,17 @@ public class ReviewService {
 
         List<Review> reviews = reviewRepository.findAllByPlaceOrderByCreatedAtDesc(place);
 
+        List<Review> filteredReviews = reviews.stream()
+                .filter(review -> review.getUser() != null)
+                .collect(Collectors.toList());
+
         if (userId == null) {
-            return reviews.stream()
+            return filteredReviews.stream()
                     .map(ReviewListResponse::of)
                     .collect(Collectors.toList());
         }
 
-        return reviews.stream()
+        return filteredReviews.stream()
                 .map(review -> ReviewListResponse.of(review, userId))
                 .collect(Collectors.toList());
     }
